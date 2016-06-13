@@ -1,6 +1,6 @@
 import twemoji from 'twemoji';
 import data from './data';
-
+console.log(data);
 let defaults = {
   width: '200',
   height: '300',
