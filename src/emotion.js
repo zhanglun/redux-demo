@@ -1,6 +1,5 @@
 import twemoji from 'twemoji';
 import data from './data';
-console.log(data);
 let defaults = {
   width: '200',
   height: '300',
@@ -8,6 +7,10 @@ let defaults = {
   fadeTime: 100,
 };
 let emotionPanelHtml = require('./panel.html');
+
+// function parseEmojiWithOption(val, options){
+//   return twemoji.parse(val,);
+// }
 
 function Emotion(conf) {
   this.settings = Object.assign({}, defaults, conf);
@@ -33,6 +36,16 @@ Emotion.prototype.createPicker = function(){
   this.$el.emotionPanel.id = 'emotion_' + this.settings.uuid;
   this.$el.emotionPanel.className = 'emotion-panel';
   this.$el.emotionPanel.innerHTML = emotionPanelHtml;
+  this.$el.emotionTablist = this.$el.emotionPanel.querySelector('.emotion-tab');
+  this.$el.emotionContentlist = this.$el.emotionPanel.querySelector('.emotion-content');
+  console.log(data);
+  let _tablist = '';
+  let _contentlist = '';
+  data.forEach(function(item, i){
+    _tablist += '<span class="emotion-tabitem">' + twemoji.parse(item.tabname) + '</span>';
+    // _contentlist += '<div class="emotion-contentitem">' +  + '</div>';
+  });
+  this.$el.emotionTablist.innerHTML = _tablist;
   this.$el.container.appendChild(this.$el.emotionPanel);
 };
 
