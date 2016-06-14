@@ -20,6 +20,6 @@ let emotion = null;
 // }, false);
 
 $(btn).emotion({
-  inputer: $('#inputer'),
-  
+  input: $('#inputer'),
+
 });

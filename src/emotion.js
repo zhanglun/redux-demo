@@ -1,5 +1,6 @@
 import twemoji from 'twemoji';
 import data from './data';
+
 let defaults = {
   width: '200',
   height: '300',
@@ -21,15 +22,22 @@ let defaults = {
 };
 
 let emotionPanelHtml = require('./panel.html');
-console.log($);
+
+// 获取当前光标所在的位置
+let _getPointPosition = function(elem){
+  var pos = 0;
+  // 非IE
+  if (elem.selectionStart) {
+    pos = elem.selectionStart;
+  }
+  return pos;
+};
+
 
 function Emotion(el, conf) {
   this.settings = $.extend({}, defaults, conf);
-  // if (document.getElementById('emotion_' + conf.uuid)) {
-  //   return;
-  // }
   this.$el = {};
-  // 出发的按钮
+  // 发的按钮
   this.$el.btn = $(el);
   // 面板的容器
   this.$el.container = $(el).parent();
@@ -61,8 +69,6 @@ Emotion.prototype.createPicker = function () {
   this.$el.emotionTablist = this.$el.emotionPanel.find('.emotion-tab');
   this.$el.emotionContentlist = this.$el.emotionPanel.find('.emotion-content');
 
-  console.log(data);
-
   data.forEach((item, i) => {
     let active = i === this.settings.defaultTab ? 'active' : '';
 
@@ -84,9 +90,11 @@ Emotion.prototype.createPicker = function () {
  * 表情键盘上的事件绑定
  */
 Emotion.prototype.bindEvents = function () {
-  var _this = this;
-  var $tabList = this.$el.emotionTablist;
-  var $contentList = this.$el.emotionContentlist;
+  let _this = this;
+  let $tabList = this.$el.emotionTablist;
+  let $contentList = this.$el.emotionContentlist;
+
+  // 切换tab
   $tabList.on('click', '.emotion-tabitem', function (event) {
     let $this = $(this);
     let targetIndex = $this.attr('data-tab-index');
@@ -103,6 +111,14 @@ Emotion.prototype.bindEvents = function () {
         .addClass('active');
     }
 
+  });
+
+  // 选中表情
+  $contentList.on('click', '.emotion-item', function(e){
+    debugger;
+    let val = $(this).find('img').attr('alt');
+    let currentPos = _getPointPosition(_this.$target.get(0));
+    _this.$target.val(_this.$target.val() + val);
   });
 };
 
@@ -131,7 +147,7 @@ Emotion.prototype.load = function (index) {
  * 打开或者隐藏
  */
 Emotion.prototype.openAndClose = function () {
-  var $panel = this.$el.emotionPanel;
+  let $panel = this.$el.emotionPanel;
   if ($panel.hasClass('open')) {
     $panel
       .removeClass('open')
