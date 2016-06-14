@@ -7,7 +7,7 @@ let defaults = {
   fadeTime: 100,
   input: '', // 要绑定的表单元素的选择器
   imgPath: "https://dn-mdpub.qbox.me/emotion/", // 表情图片的路径
-  defaultTab: 0, // 默认显示哪一列表情
+  defaultTab: 1, // 默认显示哪一列表情
   mdBear: true, // 是否显示明道表情
   offset: 20, // 尖角的位置偏移
   history: true, // 是否显示历史表情
@@ -29,8 +29,13 @@ function Emotion(el, conf) {
   //   return;
   // }
   this.$el = {};
-  this.$el.container = this.settings.container;
-  this.$el.triggerBtn = this.settings.triggerBtn;
+  // 出发的按钮
+  this.$el.btn = $(el);
+  // 面板的容器
+  this.$el.container = $(el).parent();
+  // 接收表情的容器
+  this.$target = $(this.settings.input);
+
   this.init();
 }
 
@@ -38,8 +43,7 @@ Emotion.prototype.init = function () {
   console.log('emoji keybroad init!');
   this.createPicker();
   this.isOpen = false;
-  this.$target = $(this.options.input);
-  this.$el.on("click", $.proxy(this.toggle, this));
+  this.$el.btn.on("click", $.proxy(this.openAndClose, this));
 };
 
 /**
@@ -62,7 +66,7 @@ Emotion.prototype.createPicker = function () {
   data.forEach((item, i) => {
     let active = i === this.settings.defaultTab ? 'active' : '';
 
-    _tablist += '<span class="emotion-tabitem ' + active + '" data-tab-index="' + (i) + '"">' + twemoji.parse(item.tabname) + '</span>';
+    _tablist += '<span class="emotion-tabitem ' + active + '" data-tab-index="' + (i) + '"">' + twemoji.parse(item.name) + '</span>';
     _contentlist += '<div class="emotion-contentitem ' + active + '">' + _faceItems + '</div>';
   });
 
@@ -72,6 +76,7 @@ Emotion.prototype.createPicker = function () {
   this.$el.container.append(this.$el.emotionPanel);
 
   this.load(this.settings.defaultTab);
+
   this.bindEvents();
 };
 
@@ -117,8 +122,7 @@ Emotion.prototype.load = function (index) {
   }
 
   data[index].content.forEach(function (face, i) {
-    console.log(face);
-    _faceItems += '<span class="emotion-item">' + twemoji.parse(face.value) + '</span>';
+    _faceItems += '<span class="emotion-item">' + twemoji.parse(face) + '</span>';
   });
   $content.html(_faceItems).data('load', true);
 };
