@@ -1,4 +1,5 @@
 var path = require('path');
+var webpack = require('webpack');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var CopyWebpackPlugin = require('copy-webpack-plugin');
@@ -58,8 +59,7 @@ module.exports = {
     }, {
       test: /\.html$/,
       loader: 'html',
-    },
-    ],
+    }, ],
   },
   vue: {
     loaders: {
@@ -75,15 +75,24 @@ module.exports = {
       'transform-runtime',
     ],
   },
+  resolve: {
+    root: [],
+    alias: {
+      'jquery': path.resolve(APP_PATH, 'node_modules/jquery/dist/jquery.min.js'),
+    }
+  },
   plugins: [
+    new webpack.ProvidePlugin({
+      $: 'jquery'
+    }),
     new ExtractTextPlugin('style.bundle.css'),
     new HtmlWebpackPlugin({
       template: SRC_PATH + '/index.html',
       filename: 'index.html',
     }),
     new CopyWebpackPlugin([{
-      from: SRC_PATH + '/vendor', to: BUILD_PATH + '/vendor',
-    },
-  ]),
+      from: SRC_PATH + '/vendor',
+      to: BUILD_PATH + '/vendor',
+    }, ]),
   ],
 };
