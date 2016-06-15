@@ -24,15 +24,15 @@ let defaults = {
 let emotionPanelHtml = require('./panel.html');
 
 // 获取当前光标所在的位置
-let _getPointPosition = function(elem){
+let _getPointPosition = function (elem) {
   var pos = 0;
   // 非IE
   if (elem.selectionStart) {
     pos = elem.selectionStart;
   }
+
   return pos;
 };
-
 
 function Emotion(el, conf) {
   this.settings = $.extend({}, defaults, conf);
@@ -114,12 +114,20 @@ Emotion.prototype.bindEvents = function () {
   });
 
   // 选中表情
-  $contentList.on('click', '.emotion-item', function(e){
-    debugger;
+  $contentList.on('click', '.emotion-item', function (e) {
     let val = $(this).find('img').attr('alt');
     let currentPos = _getPointPosition(_this.$target.get(0));
-    _this.$target.val(_this.$target.val() + val);
-  });
+    let oldVal = _this.$target.val();
+    let target = _this.$target.get(0);
+
+    _this.$target.val(oldVal.slice(0, currentPos) + val + oldVal.slice(currentPos));
+    document.title = currentPos + val.length;
+    if (target.setSelectionRange) {
+      target.setSelectionRange(currentPos + val.length, currentPos + val.length);
+    } else {
+
+    }
+  })
 };
 
 /**
