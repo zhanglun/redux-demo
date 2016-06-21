@@ -34,6 +34,7 @@ let _getPointPosition = function (elem) {
   return pos;
 };
 
+
 function Emotion(el, conf) {
   this.settings = $.extend({}, defaults, conf);
   this.$el = {};
@@ -47,6 +48,10 @@ function Emotion(el, conf) {
   this.init();
 }
 
+/**
+ * 初始化，绑定按钮的点击事件
+ * @return {[type]} [description]
+ */
 Emotion.prototype.init = function () {
   console.log('emoji keybroad init!');
   this.createPicker();
@@ -72,7 +77,7 @@ Emotion.prototype.createPicker = function () {
   data.forEach((item, i) => {
     let active = i === this.settings.defaultTab ? 'active' : '';
 
-    _tablist += '<span class="emotion-tabitem ' + active + '" data-tab-index="' + (i) + '"">' + twemoji.parse(item.name) + '</span>';
+    _tablist += '<span class="emotion-tabitem ' + active + '" data-tab-index="' + (i) + '"">' + item.name.split('|')[1] + '</span>';
     _contentlist += '<div class="emotion-contentitem ' + active + '">' + _faceItems + '</div>';
   });
 
