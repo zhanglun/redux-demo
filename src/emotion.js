@@ -8,7 +8,7 @@ let defaults = {
   fadeTime: 100,
   input: '', // 要绑定的表单元素的选择器
   imgPath: "https://dn-mdpub.qbox.me/emotion/", // 表情图片的路径
-  defaultTab: 1, // 默认显示哪一列表情
+  defaultTab: 0, // 默认显示哪一列表情
   mdBear: true, // 是否显示明道表情
   offset: 20, // 尖角的位置偏移
   history: true, // 是否显示历史表情
@@ -220,6 +220,11 @@ export default Emotion;
 function _insertimg(container, elemstr) {
   var selection = window.getSelection ? window.getSelection() : document.selection;
   var range = selection.createRange ? selection.createRange() : selection.getRangeAt(0);
+  if (window.lastEditRange) {
+    // 存在最后光标对象，选定对象清除所有光标并添加最后光标还原之前的状态
+    selection.removeAllRanges()
+    selection.addRange(lastEditRange)
+  }
   if (!window.getSelection) {
     container.focus();
     selection.getRangeAt(0);
@@ -237,12 +242,56 @@ function _insertimg(container, elemstr) {
       hasR_lastChild = hasR_lastChild.previousSibling;
       hasR.removeChild(e)
     }
-    range.insertNode(hasR);
-    if (hasR_lastChild) {
-      range.setEndAfter(hasR_lastChild);
-      range.setStartAfter(hasR_lastChild)
+    // 插入的时候做差异处理
+    if (selection.anchorNode.nodeName != '#text') {
+      console.log('当前范围是anchorNode:', selection.anchorNode);
+      var imgElem = $(elemstr);
+      // if (container.childNodes.length > 0) {
+      //   for (var i = 0; i < container.childNodes.length; i++) {
+      //     if (i == selection.anchorOffset) {
+      //       container.insertBefore(imgElem.get(0), container.childNodes[i])
+      //     }
+      //   }
+      // } else {
+      //   container.appendChild(imgElem.get(0));
+      // }
+
+
+      // 创建新的光标对象
+      var range = document.createRange()
+      // 光标对象的范围界定为新建的表情节点
+      // range.selectNodeContents(imgElem.get(0))
+      // 光标位置定位在表情节点的最大长度
+      // range.setStart(imgElem.get(0), 0)
+      // range.setEndAfter(hasR_lastChild);
+      // range.setStartAfter(hasR_lastChild);
+      range = selection.getRangeAt(0);
+      range.insertNode(hasR);
+      if (hasR_lastChild) {
+        range.setEndAfter(hasR_lastChild);
+        range.setStartAfter(hasR_lastChild);
+      }
+
+      // 使光标开始和光标结束重叠
+      range.collapse(true)
+
+
+    } else {
+      console.log('当前范围是anchorNode:', selection.anchorNode);
+      range = selection.getRangeAt(0);
+      range.insertNode(hasR);
+      if (hasR_lastChild) {
+        range.setEndAfter(hasR_lastChild);
+        range.setStartAfter(hasR_lastChild);
+      }
+
     }
-    selection.removeAllRanges();
+    // 清除选定对象的所有光标对象
+    selection.removeAllRanges()
+    // 插入新的光标对象
     selection.addRange(range)
+    window.lastEditRange = selection.getRangeAt(0);
+
   }
+  container.focus();
 }

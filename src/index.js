@@ -8,7 +8,7 @@ let emotion = null;
 
 // 获取当前光标所在的位置
 let _getPointPosition = function (elem) {
-   var caretOffset = 0;
+    var caretOffset = 0;
     var doc = elem.ownerDocument || elem.document;
     var win = doc.defaultView || doc.parentWindow;
     var sel;
@@ -21,7 +21,7 @@ let _getPointPosition = function (elem) {
             preCaretRange.setEnd(range.endContainer, range.endOffset);
             caretOffset = preCaretRange.toString().length;
         }
-    } else if ( (sel = doc.selection) && sel.type != "Control") {
+    } else if ((sel = doc.selection) && sel.type != "Control") {
         var textRange = sel.createRange();
         var preCaretTextRange = doc.body.createTextRange();
         preCaretTextRange.moveToElementText(elem);
@@ -31,19 +31,26 @@ let _getPointPosition = function (elem) {
     return caretOffset;
 };
 
-let _setEditableCaretPostion = function(elem, pos){
-  var range = document.createRange();
-  var sel = window.getSelection();
-  range.setStart(el.childNodes[2], pos);
-  range.collapse(true);
-  sel.removeAllRanges();
-  sel.addRange(range);
+let _setEditableCaretPostion = function (elem, pos) {
+    var range = document.createRange();
+    var sel = window.getSelection();
+    range.setStart(el.childNodes[2], pos);
+    range.collapse(true);
+    sel.removeAllRanges();
+    sel.addRange(range);
 };
 
 $(btn).emotion({
-  input: $('.emoji-editor'),
+    input: $('.emoji-editor'),
 });
 $('.emoji-editor').on('keyup', (e) => {
-  // var currentPos = _getPointPosition($('.emoji-editor').get(0));
-  // console.log(currentPos);
-});
+    // 获取选定对象
+    var selection = getSelection();
+    // 设置最后光标对象
+    window.lastEditRange = selection.getRangeAt(0);
+}).on('click', (e) => {
+// 获取选定对象
+    var selection = getSelection();
+    // 设置最后光标对象
+    window.lastEditRange = selection.getRangeAt(0);
+})

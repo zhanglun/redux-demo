@@ -1,0 +1,68 @@
+.main {
+  width: 600px;
+  padding: 20px;
+  box-sizing: border-box;
+  background: #fbfbfb;
+}
+.emoji-editor {
+  width: 100%;
+  height: 300px;
+  padding: 4px;
+  box-sizing: border-box;
+  border: 1px solid #c3c3c3;
+  outline: none;
+}
+.emoji {
+  position: relative;
+}
+.emotion-tab {
+  display: flex;
+  border-bottom: 1px solid #d4d4d4;
+}
+.emotion-tabitem {
+  width: 30px;
+  height: 30px;
+  padding: 6px 8px;
+  font-size: 20px;
+  text-align: center;
+  cursor: pointer;
+  color: #a7a7a7;
+}
+.emotion-tabitem.active {
+  color: #000;
+}
+.emotion-panel {
+  border: 1px solid #d4d4d4;
+  width: 350px;
+  height: 300px;
+  display: none;
+  position: absolute;
+  left: 0;
+  top: 20px;
+}
+.emotion-panel.open {
+  display: block;
+}
+.emotion-content {
+  height: 100%;
+}
+.emotion-contentitem {
+  display: none;
+  height: 100%;
+  overflow-y: scroll;
+}
+.emotion-contentitem.active {
+  display: block;
+}
+.emotion-item {
+  width: 30px;
+  height: 30px;
+  margin: 8px 4px;
+  display: inline-block;
+  cursor: pointer;
+}
+.emotion-item img {
+  width: 100%;
+}
+
+/*# sourceMappingURL=style.bundle.css.map*/
