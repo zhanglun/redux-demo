@@ -62,9 +62,8 @@ $('.emoji-editor').on('paste', (e) => {
 
     // 将复制的图文混合中包含的图片直接去掉 
     let clipboardData = e.originalEvent.clipboardData;
-    let data = clipboardData.getData('text/plain') || '';
+    let data = clipboardData ? clipboardData.getData('text/plain') : window.clipboardData.getData('Text');
     if (data) {
-        console.log(data);
         // 插入文本 
         var eidtor = $('.emoji-editor').get(0);
         eidtor.focus()
@@ -85,7 +84,7 @@ $('.emoji-editor').on('paste', (e) => {
                 // 如果文本框的子元素大于0，则表示有其他元素，则按照位置插入表情节点
                 for (var i = 0; i < eidtor.childNodes.length; i++) {
                     if (i == selection.anchorOffset) {
-                        eidtor.insertBefore(text, edit.childNodes[i])
+                        eidtor.insertBefore(text, eidtor.childNodes[i])
                     }
                 }
             } else {
