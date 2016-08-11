@@ -249,7 +249,7 @@ function _insertimg(container, elemstr) {
       // if (container.childNodes.length > 0) {
       //   for (var i = 0; i < container.childNodes.length; i++) {
       //     if (i == selection.anchorOffset) {
-      //       container.insertBefore(imgElem.get(0), container.childNodes[i])
+      //       container.insertBefore(imgElem.get(0), container.childNodes[i + 1])
       //     }
       //   }
       // } else {
@@ -257,24 +257,33 @@ function _insertimg(container, elemstr) {
       // }
 
 
-      // 创建新的光标对象
-      var range = document.createRange()
-      // 光标对象的范围界定为新建的表情节点
+      // // 创建新的光标对象
+      // var range = document.createRange()
+      // // 光标对象的范围界定为新建的表情节点
       // range.selectNodeContents(imgElem.get(0))
-      // 光标位置定位在表情节点的最大长度
-      // range.setStart(imgElem.get(0), 0)
-      // range.setEndAfter(hasR_lastChild);
-      // range.setStartAfter(hasR_lastChild);
+      // // 光标位置定位在表情节点的最大长度
+      // // range.setStart(imgElem.get(0), 0);
+      // // 使光标开始和光标结束重叠
+      // range.collapse(false)
+
+      // // range.selectNodeContents(imgElem.get(0))
+      // // 清除选定对象的所有光标对象
+      // selection.removeAllRanges()
+      // // 插入新的光标对象
+      // // range.deleteContents();
+      // // range.selectNodeContents(imgElem.get(0));
+      // selection.addRange(range);
+
       range = selection.getRangeAt(0);
       range.insertNode(hasR);
       if (hasR_lastChild) {
         range.setEndAfter(hasR_lastChild);
         range.setStartAfter(hasR_lastChild);
       }
-
-      // 使光标开始和光标结束重叠
-      range.collapse(true)
-
+      // 清除选定对象的所有光标对象
+      selection.removeAllRanges()
+      // 插入新的光标对象
+      selection.addRange(range)
 
     } else {
       console.log('当前范围是anchorNode:', selection.anchorNode);
@@ -284,12 +293,12 @@ function _insertimg(container, elemstr) {
         range.setEndAfter(hasR_lastChild);
         range.setStartAfter(hasR_lastChild);
       }
-
+      // 清除选定对象的所有光标对象
+      selection.removeAllRanges()
+      // 插入新的光标对象
+      selection.addRange(range)
     }
-    // 清除选定对象的所有光标对象
-    selection.removeAllRanges()
-    // 插入新的光标对象
-    selection.addRange(range)
+
     window.lastEditRange = selection.getRangeAt(0);
 
   }

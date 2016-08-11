@@ -43,17 +43,19 @@ let _setEditableCaretPostion = function (elem, pos) {
 $(btn).emotion({
     input: $('.emoji-editor'),
 });
-// $('.emoji-editor').on('keyup', (e) => {
-//     // 获取选定对象
-//     var selection = getSelection();
-//     // 设置最后光标对象
-//     window.lastEditRange = selection.getRangeAt(0);
-// }).on('click', (e) => {
-// // 获取选定对象
-//     var selection = getSelection();
-//     // 设置最后光标对象
-//     window.lastEditRange = selection.getRangeAt(0);
-// })
+$('.emoji-editor').on('keyup', (e) => {
+    // 获取选定对象
+    var selection = getSelection();
+    // 设置最后光标对象
+    window.lastEditRange = selection.getRangeAt(0);
+
+
+}).on('click', (e) => {
+    // 获取选定对象
+    var selection = getSelection();
+    // 设置最后光标对象
+    window.lastEditRange = selection.getRangeAt(0);
+})
 
 $('.emoji-editor').on('paste', (e) => {
     console.log(e);
