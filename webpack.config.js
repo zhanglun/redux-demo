@@ -49,13 +49,16 @@ module.exports = {
       },
       include: SRC_PATH,
     }, {
-      test: /\.css$|\.less$/,
+      test: /\.less$/,
       // loaders: ['style-loader', 'css-loader?sourceMap', 'sass-loader'],
       loader: ExtractTextPlugin.extract([
         'css-loader?sourceMap',
         'less-loader',
       ]),
       include: SRC_PATH,
+    },{
+      test: /\.css$/,
+      loader: 'style!css',
     }, {
       test: /\.html$/,
       loader: 'html',
