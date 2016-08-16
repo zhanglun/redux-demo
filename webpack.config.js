@@ -84,6 +84,7 @@ module.exports = {
       'jquery': path.resolve(APP_PATH, 'node_modules/jquery/dist/jquery.min.js'),
     }
   },
+  // devtool: 'sourceMap',
   plugins: [
     new webpack.ProvidePlugin({
       $: 'jquery'

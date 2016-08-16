@@ -1,6 +1,7 @@
 require('./emotion.less');
 import Emotion from './emotion';
-import '../node_modules/jquery.caret/dist/jquery.caret.js';
+import 'jquery';
+require('../node_modules/jquery.caret/src/jquery.caret.js');
 import '../node_modules/at.js/dist/js/jquery.atwho.js';
 import '../node_modules/at.js/dist/css/jquery.atwho.css';
 
@@ -132,32 +133,8 @@ $('.emoji-editor').on('paste', (e) => {
     return false;
 });
 
-var emojis = ["smile", "iphone", "girl", "smiley", "heart", "kiss", "copyright", "coffee"];
-var emojisList = $.map(emojis, function (value, i) {
-    return { 'id': i, 'name': value };
-});
 
-var names = ["Jacob", "Isabella", "Ethan", "Emma", "Michael", "Olivia", "Alexander", "Sophia", "William", "Ava", "Joshua", "Emily", "Daniel", "Madison", "Jayden", "Abigail", "Noah", "Chloe", "你好", "你你你"];
-//http://a248.e.akamai.net/assets.github.com/images/icons/emoji/8.png
-// $('.emoji-editor').atwho({
-//     at: "@",
-//     data: names,
-//     startWithSpace: false, //是否已空格开始
-//     displayTpl: "<li>${name}</li>",//显示模板
-//     insertTpl: "<b>${atwho-at}${name}</b>",//插入模板
-//     limit: 100,
-//     highlightFirst: true,
-// });
-
-// $('.emoji-editor').atwho({
-//   at: "@",
-//   data: ["one", "two", "three"],
-// }).atwho({
-//   at: ":",
-//   data: ["+1", "-1", "smile"]
-// });
-
-
+  $(function(){
     $.fn.atwho.debug = true
     var emojis = [
       "smile", "iphone", "girl", "smiley", "heart", "kiss", "copyright", "coffee",
@@ -192,9 +169,19 @@ var names = ["Jacob", "Isabella", "Ethan", "Emma", "Michael", "Olivia", "Alexand
       at: "@",
       data: names,
       headerTpl: '<div class="atwho-header">Member List<small>↑&nbsp;↓&nbsp;</small></div>',
-      insertTpl: '${name}',
+      insertTpl: '<span>${atwho-at}${name}</span>',
       displayTpl: "<li>${name} <small>${email}</small></li>",
-      limit: 200
+      limit: 200,
+      startWithSpace: false,
+      callbacks: {
+          remoteFilter: function(){
+              console.log(arguments);
+          },
+          beforeInsert: function(value, $item,e) {
+              console.log($item);
+              return value;
+          },
+      }
     }
     var emoji_config = {
       at: ":",
@@ -203,11 +190,30 @@ var names = ["Jacob", "Isabella", "Ethan", "Emma", "Michael", "Olivia", "Alexand
       insertTpl: ':${key}:',
       delay: 400
     }
-    $inputor = $('.emoji-editor').atwho(at_config).atwho(emoji_config);
-    $inputor.caret('pos', 47);
-    $inputor.focus().atwho('run');
-
     emoji_config.insertTpl = "<img src='https://assets-cdn.github.com/images/icons/emoji/${name}.png'  height='20' width='20' />"
+    $('.emoji-editor').atwho(at_config).atwho(emoji_config);
+    $('.emoji-editor').on('inserted.atwho', function(e){
+        
+         $(this).find('.atwho-inserted span').first().unwrap();
+         console.log(e);
+    });
+    $('.emoji-editor').on('keydown', function(e){
+        if(e.keyCode == 13){
+            console.log('---->fuck 没有阻止！！！');
+        }
+    })
 
+    // ifr = $('#iframe1')[0]
+    // doc = ifr.contentDocument || iframe.contentWindow.document
+    // if ((ifrBody = doc.body) == null) {
+    //   // For IE
+    //   doc.write("<body></body>")
+    //   ifrBody = doc.body
+    // }
+    // ifrBody.contentEditable = true
+    // ifrBody.id = 'ifrBody'
+    // ifrBody.innerHTML = 'For <strong>WYSIWYG</strong> which using <strong>iframe</strong> such as <strong>ckeditor</strong>'
+    // $(ifrBody).atwho('setIframe', ifr).atwho(at_config)
+  });
 
   
