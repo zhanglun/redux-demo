@@ -230,9 +230,10 @@
 	    };
 	    emoji_config.insertTpl = "<img src='https://assets-cdn.github.com/images/icons/emoji/${name}.png'  height='20' width='20' />";
 	    $('.emoji-editor').atwho(at_config).atwho(emoji_config);
-	    $('.emoji-editor').on('inserted.atwho', function () {
+	    $('.emoji-editor').on('inserted.atwho', function (e) {
 
 	        $(this).find('.atwho-inserted span').first().unwrap();
+	        console.log(e);
 	    });
 	    $('.emoji-editor').on('keydown', function (e) {
 	        if (e.keyCode == 13) {
@@ -1571,7 +1572,6 @@
 	          return;
 	        }
 	        if (view.highlighted()) {
-	          console.log(e);
 	          e.preventDefault();
 	          view.choose(e);
 	        } else {
