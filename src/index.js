@@ -1,9 +1,9 @@
-require('./emotion.less');
-import Emotion from './emotion';
+import Emotion from './components/emotion';
 import 'jquery';
-require('../node_modules/jquery.caret/src/jquery.caret.js');
+import '../node_modules/jquery.caret/src/jquery.caret.js';
 import '../node_modules/at.js/dist/js/jquery.atwho.js';
 import '../node_modules/at.js/dist/css/jquery.atwho.css';
+import * as util from './util';
 
 let btn = document.querySelector('.emojiBtn');
 let emojiContainer = btn.parentNode;
@@ -47,11 +47,50 @@ let _setEditableCaretPostion = function (elem, pos) {
 $(btn).emotion({
     input: $('.emoji-editor'),
 });
-$('.emoji-editor').on('keyup', (e) => {
+
+var editor = new MediumEditor('.emoji-editor', {
+    disableReturn: true,
+    disableDoubleReturn: true,
+    disableExtraSpaces: true,
+    disableEditing: true,
+    toolbar: false,
+    anchor: {
+        placeholderText: 'Type a link',
+        customClassOption: 'btn',
+        customClassOptionText: 'Create Button'
+    },
+    paste: {
+        cleanAttrs: ['class', 'style', 'dir'],
+        cleanTags: ['label', 'meta', 'img']
+    },
+    anchorPreview: {
+        hideDelay: 300
+    },
+    placeholder: {
+        text: 'Click to edit'
+    }
+});
+
+editor.subscribe('editableKeydown', function (e, elem) {
+    if ((event.metaKey || event.ctrlKey || event.altKey || event.shiftKey)
+        && event.keyCode === 13) {
+        // 换行处理
+        // 阻断原处理流程
+        event.preventDefault();
+        util.insertElemToEditor($('.emoji-editor').get(0), '<br />');
+        util.insertElemToEditor($('.emoji-editor').get(0), '<br />');
+    }
+});
+$('.emoji-editor').on('keyup', function (e) {
     // 获取选定对象
     var selection = getSelection();
     // 设置最后光标对象
     window.lastEditRange = selection.getRangeAt(0);
+    if (e.keyCode == 13 && e.ctrlKey) {
+        console.log('换行');
+    }else if (e.keyCode == 13 && !e.ctrlKey) {
+        console.log('faxiaoxi ');
+    }
 }).on('click', (e) => {
     // 获取选定对象
     var selection = getSelection();
@@ -59,82 +98,28 @@ $('.emoji-editor').on('keyup', (e) => {
     window.lastEditRange = selection.getRangeAt(0);
 })
 
-$('.emoji-editor').on('paste', (e) => {
+// $('.emoji-editor').on('paste', (e) => {
 
-    // 考虑到以后会存在文件之类的出img之外的标签，
-    // 所以只能在粘贴的时候先去掉标签然后插入到光标所在位置 
+//     // 考虑到以后会存在文件之类的出img之外的标签，
+//     // 所以只能在粘贴的时候先去掉标签然后插入到光标所在位置 
 
-    // 将复制的图文混合中包含的图片直接去掉 
-    let clipboardData = e.originalEvent.clipboardData;
-    let data = clipboardData ? clipboardData.getData('text/plain') : window.clipboardData.getData('Text');
-    if (data) {
-        // 插入文本 
-        var eidtor = $('.emoji-editor').get(0);
-        eidtor.focus()
-        // 获取选定对象
-        var selection = getSelection()
-        // 判断是否有最后光标对象存在
-        if (lastEditRange) {
-            // 存在最后光标对象，选定对象清除所有光标并添加最后光标还原之前的状态
-            selection.removeAllRanges()
-            selection.addRange(lastEditRange)
-        }
-        // 判断选定对象范围是编辑框还是文本节点
-        if (selection.anchorNode.nodeName != '#text') {
-            // 如果是编辑框范围。则创建表情文本节点进行插入
-            var text = document.createTextNode(data)
+//     // 将复制的图文混合中包含的图片直接去掉 
+//     let clipboardData = e.originalEvent.clipboardData;
+//     let data = clipboardData ? clipboardData.getData('text/plain') : window.clipboardData.getData('Text');
+//     if (data) {
+//         // 插入文本 
+//         var eidtor = $('.emoji-editor').get(0);
+//         util.insertTextToEditor(editor, text);
+//     }
+//     e.preventDefault();
+//     return false;
+// });
 
-            if (eidtor.childNodes.length > 0) {
-                // 如果文本框的子元素大于0，则表示有其他元素，则按照位置插入表情节点
-                for (var i = 0; i < eidtor.childNodes.length; i++) {
-                    if (i == selection.anchorOffset) {
-                        eidtor.insertBefore(text, eidtor.childNodes[i])
-                    }
-                }
-            } else {
-                // 否则直接插入一个表情元素
-                eidtor.appendChild(text)
-            }
-            // 创建新的光标对象
-            var range = document.createRange()
-            // 光标对象的范围界定为新建的表情节点
-            range.selectNodeContents(text)
-            // 光标位置定位在表情节点的最大长度
-            range.setStart(text, text.length)
-            // 使光标开始和光标结束重叠
-            range.collapse(true)
-            // 清除选定对象的所有光标对象
-            selection.removeAllRanges()
-            // 插入新的光标对象
-            selection.addRange(range)
-        } else {
-            // 如果是文本节点则先获取光标对象
-            var range = selection.getRangeAt(0)
-            // 获取光标对象的范围界定对象，一般就是textNode对象
-            var textNode = range.startContainer;
-            // 获取光标位置
-            var rangeStartOffset = range.startOffset;
-            // 文本节点在光标位置处插入新的表情内容
-            textNode.insertData(rangeStartOffset, data)
-            // 光标移动到到原来的位置加上新内容的长度
-            range.setStart(textNode, rangeStartOffset + data.length)
-            // 光标开始和光标结束重叠
-            range.collapse(true)
-            // 清除选定对象的所有光标对象
-            selection.removeAllRanges()
-            // 插入新的光标对象
-            selection.addRange(range)
-        }
-        // 无论如何都要记录最后光标对象
-        lastEditRange = selection.getRangeAt(0)
 
-    }
-    e.preventDefault();
-    return false;
-});
 
 
 $(function () {
+
     $.fn.atwho.debug = true
     var emojis = [
         "smile", "iphone", "girl", "smiley", "heart", "kiss", "copyright", "coffee",
@@ -191,30 +176,12 @@ $(function () {
         delay: 400
     }
     emoji_config.insertTpl = "<img src='https://assets-cdn.github.com/images/icons/emoji/${name}.png'  height='20' width='20' />"
-    $('.emoji-editor').on('keypress', function (e) {
-        console.log(window.test);
-        if (e.keyCode == 13) {
-            console.log('---->fuck 没有阻止！！！');
-        }
-    })
 
     $('.emoji-editor').atwho(at_config).atwho(emoji_config);
     $('.emoji-editor').on('inserted.atwho', function (e) {
         $(this).find('.atwho-inserted span').first().unwrap();
-        window.test = true;
     });
 
-    // ifr = $('#iframe1')[0]
-    // doc = ifr.contentDocument || iframe.contentWindow.document
-    // if ((ifrBody = doc.body) == null) {
-    //   // For IE
-    //   doc.write("<body></body>")
-    //   ifrBody = doc.body
-    // }
-    // ifrBody.contentEditable = true
-    // ifrBody.id = 'ifrBody'
-    // ifrBody.innerHTML = 'For <strong>WYSIWYG</strong> which using <strong>iframe</strong> such as <strong>ckeditor</strong>'
-    // $(ifrBody).atwho('setIframe', ifr).atwho(at_config)
 });
 
 
