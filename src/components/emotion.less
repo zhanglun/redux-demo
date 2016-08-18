@@ -1,0 +1,77 @@
+.main {
+  width: 600px;
+  padding: 20px;
+  box-sizing: border-box;
+  background: #fbfbfb;
+}
+// Editor
+.emoji{
+  &-editor{
+    width: 100%;
+    height: 300px;
+    padding: 4px;
+    box-sizing: border-box;
+    border: 1px solid #c3c3c3;
+    outline: none;
+    .emoji{
+      width:20px;
+      height:20px;
+    }
+  }
+}
+
+
+
+.emoji {
+  position: relative;
+}
+.emotion-tab{
+  display: flex;
+  border-bottom: 1px solid #d4d4d4;
+  &item{
+    width: 30px;
+    height: 30px;
+    padding: 6px 8px;
+    font-size: 20px;
+    text-align: center;
+    cursor: pointer;
+    color: #a7a7a7;
+    &.active{
+      color: #000;
+    }
+  }
+}
+.emotion-panel {
+  border: 1px solid #d4d4d4;
+  width: 350px;
+  height: 300px;
+  display: none;
+  position: absolute;
+  left: 0;
+  top: 20px;
+  &.open{
+    display: block;
+  }
+}
+.emotion-content{
+  height: 257px;
+  overflow: hidden;
+}
+.emotion-contentitem{
+  display: none;
+  height: 100%;
+  overflow-y: scroll;
+  &.active{
+    display: block;
+  }
+}
+.emotion-item{
+  width: 30px;
+  height: 30px;
+  margin: 8px 4px;
+  display: inline-block;
+  cursor: pointer;
+  img{
+    width: 100%;
+  }
+}
