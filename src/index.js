@@ -81,22 +81,6 @@ editor.subscribe('editableKeydown', function (e, elem) {
         util.insertElemToEditor($('.emoji-editor').get(0), '<br />');
     }
 });
-$('.emoji-editor').on('keyup', function (e) {
-    // 获取选定对象
-    var selection = getSelection();
-    // 设置最后光标对象
-    window.lastEditRange = selection.getRangeAt(0);
-    if (e.keyCode == 13 && e.ctrlKey) {
-        console.log('换行');
-    }else if (e.keyCode == 13 && !e.ctrlKey) {
-        console.log('faxiaoxi ');
-    }
-}).on('click', (e) => {
-    // 获取选定对象
-    var selection = getSelection();
-    // 设置最后光标对象
-    window.lastEditRange = selection.getRangeAt(0);
-})
 
 // $('.emoji-editor').on('paste', (e) => {
 
@@ -115,11 +99,7 @@ $('.emoji-editor').on('keyup', function (e) {
 //     return false;
 // });
 
-
-
-
-$(function () {
-
+function initAt() {
     $.fn.atwho.debug = true
     var emojis = [
         "smile", "iphone", "girl", "smiley", "heart", "kiss", "copyright", "coffee",
@@ -181,7 +161,29 @@ $(function () {
     $('.emoji-editor').on('inserted.atwho', function (e) {
         $(this).find('.atwho-inserted span').first().unwrap();
     });
+}
+
+
+$(function () {
+
+    initAt();
+
+    $(document).on('keydown', '.emoji-editor', function (e) {
+        // 获取选定对象
+        var selection = getSelection();
+        // 设置最后光标对象
+        window.lastEditRange = selection.getRangeAt(0);
+        if (e.keyCode == 13 && e.ctrlKey) {
+            console.log('换行');
+        } else if (e.keyCode == 13 && !e.ctrlKey) {
+            console.log('faxiaoxi ');
+        }
+    }).on('click', (e) => {
+        // 获取选定对象
+        var selection = getSelection();
+        // 设置最后光标对象
+        window.lastEditRange = selection.getRangeAt(0);
+    })
 
 });
-
 

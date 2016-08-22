@@ -108,37 +108,58 @@
 	$(btn).emotion({
 	    input: $('.emoji-editor')
 	});
-	$('.emoji-editor').on('keyup', function (e) {
-	    // 获取选定对象
-	    var selection = getSelection();
-	    // 设置最后光标对象
-	    window.lastEditRange = selection.getRangeAt(0);
-	}).on('click', function (e) {
-	    // 获取选定对象
-	    var selection = getSelection();
-	    // 设置最后光标对象
-	    window.lastEditRange = selection.getRangeAt(0);
-	});
 
-	$('.emoji-editor').on('paste', function (e) {
-
-	    // 考虑到以后会存在文件之类的出img之外的标签，
-	    // 所以只能在粘贴的时候先去掉标签然后插入到光标所在位置
-
-	    // 将复制的图文混合中包含的图片直接去掉
-	    var clipboardData = e.originalEvent.clipboardData;
-	    var data = clipboardData ? clipboardData.getData('text/plain') : window.clipboardData.getData('Text');
-	    if (data) {
-	        // 插入文本
-	        var eidtor = $('.emoji-editor').get(0);
-	        util.insertElemToEditor(editor, text);
+	var editor = new MediumEditor('.emoji-editor', {
+	    disableReturn: true,
+	    disableDoubleReturn: true,
+	    disableExtraSpaces: true,
+	    disableEditing: true,
+	    toolbar: false,
+	    anchor: {
+	        placeholderText: 'Type a link',
+	        customClassOption: 'btn',
+	        customClassOptionText: 'Create Button'
+	    },
+	    paste: {
+	        cleanAttrs: ['class', 'style', 'dir'],
+	        cleanTags: ['label', 'meta', 'img']
+	    },
+	    anchorPreview: {
+	        hideDelay: 300
+	    },
+	    placeholder: {
+	        text: 'Click to edit'
 	    }
-	    e.preventDefault();
-	    return false;
 	});
 
-	$(function () {
+	editor.subscribe('editableKeydown', function (e, elem) {
+	    if ((event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) && event.keyCode === 13) {
+	        // 换行处理
+	        // 阻断原处理流程
+	        event.preventDefault();
+	        util.insertElemToEditor($('.emoji-editor').get(0), '<br />');
+	        util.insertElemToEditor($('.emoji-editor').get(0), '<br />');
+	    }
+	});
 
+	// $('.emoji-editor').on('paste', (e) => {
+
+	//     // 考虑到以后会存在文件之类的出img之外的标签，
+	//     // 所以只能在粘贴的时候先去掉标签然后插入到光标所在位置
+
+	//     // 将复制的图文混合中包含的图片直接去掉
+	//     let clipboardData = e.originalEvent.clipboardData;
+	//     let data = clipboardData ? clipboardData.getData('text/plain') : window.clipboardData.getData('Text');
+	//     if (data) {
+	//         // 插入文本
+	//         var eidtor = $('.emoji-editor').get(0);
+	//         util.insertTextToEditor(editor, text);
+	//     }
+	//     e.preventDefault();
+	//     return false;
+	// });
+
+	function initAt() {
 	    $.fn.atwho.debug = true;
 	    var emojis = ["smile", "iphone", "girl", "smiley", "heart", "kiss", "copyright", "coffee", "a", "ab", "airplane", "alien", "ambulance", "angel", "anger", "angry", "arrow_forward", "arrow_left", "arrow_lower_left", "arrow_lower_right", "arrow_right", "arrow_up", "arrow_upper_left", "arrow_upper_right", "art", "astonished", "atm", "b", "baby", "baby_chick", "baby_symbol", "balloon", "bamboo", "bank", "barber", "baseball", "basketball", "bath", "bear", "beer", "beers", "beginner", "bell", "bento", "bike", "bikini", "bird", "birthday", "black_square", "blue_car", "blue_heart", "blush", "boar", "boat", "bomb", "book", "boot", "bouquet", "bow", "bowtie", "boy", "bread", "briefcase", "broken_heart", "bug", "bulb", "person_with_blond_hair", "phone", "pig", "pill", "pisces", "plus1", "point_down", "point_left", "point_right", "point_up", "point_up_2", "police_car", "poop", "post_office", "postbox", "pray", "princess", "punch", "purple_heart", "question", "rabbit", "racehorse", "radio", "up", "us", "v", "vhs", "vibration_mode", "virgo", "vs", "walking", "warning", "watermelon", "wave", "wc", "wedding", "whale", "wheelchair", "white_square", "wind_chime", "wink", "wink2", "wolf", "woman", "womans_hat", "womens", "x", "yellow_heart", "zap", "zzz", "+1", "-1"];
 	    var jeremy = decodeURI("J%C3%A9r%C3%A9my"); // Jérémy
@@ -177,23 +198,32 @@
 	        delay: 400
 	    };
 	    emoji_config.insertTpl = "<img src='https://assets-cdn.github.com/images/icons/emoji/${name}.png'  height='20' width='20' />";
-	    $('.emoji-editor').on('keyup', function (e) {
-	        if (e.keyCode == 13 && !e.ctrlKey) {
-	            console.log('---->-----fuck 发送消息');
-	            e.originalEvent.preventDefault();
-	            return false;
-	        }
-	        if (e.keyCode == 13 && e.ctrlKey) {
-	            console.log('----> 换行');
-	            util.insertElemToEditor($('.emoji-editor').get(0), $('<br />'));
-	            // TODO: 增加 换行
-	        }
-	    });
 
 	    $('.emoji-editor').atwho(at_config).atwho(emoji_config);
 	    $('.emoji-editor').on('inserted.atwho', function (e) {
 	        $(this).find('.atwho-inserted span').first().unwrap();
-	        window.test = true;
+	    });
+	}
+
+	$(function () {
+
+	    initAt();
+
+	    $('.emoji-editor').on('keydown.atwhoInner', function (e) {
+	        // 获取选定对象
+	        var selection = getSelection();
+	        // 设置最后光标对象
+	        window.lastEditRange = selection.getRangeAt(0);
+	        if (e.keyCode == 13 && e.ctrlKey) {
+	            console.log('换行');
+	        } else if (e.keyCode == 13 && !e.ctrlKey) {
+	            console.log('faxiaoxi ');
+	        }
+	    }).on('click', function (e) {
+	        // 获取选定对象
+	        var selection = getSelection();
+	        // 设置最后光标对象
+	        window.lastEditRange = selection.getRangeAt(0);
 	    });
 	});
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
@@ -1689,8 +1719,6 @@
 	var DEFAULT_CALLBACKS, KEY_CODE;
 
 	KEY_CODE = {
-	  DOWN: 40,
-	  UP: 38,
 	  ESC: 27,
 	  TAB: 9,
 	  ENTER: 13,
@@ -1872,7 +1900,7 @@
 	  };
 
 	  App.prototype.listen = function() {
-	    return this.$inputor.on('compositionstart', (function(_this) {
+	    this.$inputor.on('compositionstart', (function(_this) {
 	      return function(e) {
 	        var ref;
 	        if ((ref = _this.controller()) != null) {
@@ -1926,6 +1954,7 @@
 	        };
 	      };
 	    })(this)());
+	    return this;
 	  };
 
 	  App.prototype.shutdown = function() {
@@ -2022,20 +2051,20 @@
 	        if (!this.controller().getOpt('tabSelectsMatch') && e.keyCode === KEY_CODE.TAB) {
 	          return;
 	        }
+
 	        if (view.highlighted()) {
-	          e.originalEvent.stopPropagation();
-	          e.originalEvent.preventDefault();
 	          view.choose(e);
 	        } else {
 	          view.hide(e);
 	        }
 	        break;
 	      default:
+	        console.log('noop');
 	        $.noop();
 	    }
 	  };
 
-	  return App;
+	  return false;
 
 	})();
 
@@ -2657,6 +2686,15 @@
 	    if (this.context.getOpt("hideWithoutSuffix")) {
 	      return this.stopShowing = true;
 	    }
+	    
+	    console.log(e.keyCode);
+	    console.log(KEY_CODE.ENTER);
+	    if(e.keyCode === KEY_CODE.ENTER) {
+	      debugger;
+	      e.stopPropagation();
+	      e.preventDefault();
+	      return false;
+	    }
 	  };
 
 	  View.prototype.reposition = function(rect) {
@@ -3169,13 +3207,14 @@
 /* 14 */
 /***/ function(module, exports) {
 
-	'use strict';
+	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	exports.insertTextToEditor = insertTextToEditor;
 	exports.insertElemToEditor = insertElemToEditor;
-	function insertElemToEditor(editor, text) {
+	function insertTextToEditor(editor, text) {
 	  editor.focus();
 	  // 获取选定对象
 	  var selection = getSelection();
@@ -3185,6 +3224,7 @@
 	    selection.removeAllRanges();
 	    selection.addRange(lastEditRange);
 	  }
+
 	  // 判断选定对象范围是编辑框还是文本节点
 	  if (selection.anchorNode.nodeName != '#text') {
 	    // 如果是编辑框范围。则创建表情文本节点进行插入
@@ -3238,6 +3278,46 @@
 	  }
 	  // 无论如何都要记录最后光标对象
 	  lastEditRange = selection.getRangeAt(0);
+	}
+
+	function insertElemToEditor(editor, elemstr) {
+
+	  var selection = window.getSelection ? window.getSelection() : document.selection;
+	  var range = selection.createRange ? selection.createRange() : selection.getRangeAt(0);
+	  if (window.lastEditRange) {
+	    // 存在最后光标对象，选定对象清除所有光标并添加最后光标还原之前的状态
+	    selection.removeAllRanges();
+	    selection.addRange(lastEditRange);
+	  }
+	  if (!window.getSelection) {
+	    editor.focus();
+	    selection.getRangeAt(0);
+	    range.pasteHTML(elemstr);
+	    range.collapse(false);
+	    range.select();
+	  } else {
+	    editor.focus();
+	    range.collapse(false);
+	    var hasR = range.createContextualFragment(elemstr);
+	    var hasR_lastChild = hasR.lastChild;
+	    while (hasR_lastChild && hasR_lastChild.nodeName.toLowerCase() == "br" && hasR_lastChild.previousSibling && hasR_lastChild.previousSibling.nodeName.toLowerCase() == "br") {
+	      var e = hasR_lastChild;
+	      hasR_lastChild = hasR_lastChild.previousSibling;
+	      hasR.removeChild(e);
+	    }
+	    range = selection.getRangeAt(0);
+	    range.insertNode(hasR);
+	    if (hasR_lastChild) {
+	      range.setEndAfter(hasR_lastChild);
+	      range.setStartAfter(hasR_lastChild);
+	    }
+	    // 清除选定对象的所有光标对象
+	    selection.removeAllRanges();
+	    // 插入新的光标对象
+	    selection.addRange(range);
+	    window.lastEditRange = selection.getRangeAt(0);
+	  }
+	  editor.focus();
 	}
 
 /***/ }
