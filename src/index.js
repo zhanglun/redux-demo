@@ -10,45 +10,70 @@ let emojiContainer = btn.parentNode;
 let uuid = Math.random().toString(36).substring(2);
 let emotion = null;
 
-// 获取当前光标所在的位置
-let _getPointPosition = function (elem) {
-    var caretOffset = 0;
-    var doc = elem.ownerDocument || elem.document;
-    var win = doc.defaultView || doc.parentWindow;
-    var sel;
-    if (typeof win.getSelection != "undefined") {
-        sel = win.getSelection();
-        if (sel.rangeCount > 0) {
-            var range = win.getSelection().getRangeAt(0);
-            var preCaretRange = range.cloneRange();
-            preCaretRange.selectNodeContents(elem);
-            preCaretRange.setEnd(range.endContainer, range.endOffset);
-            caretOffset = preCaretRange.toString().length;
+
+$(function () {
+
+    $(btn).emotion({
+        input: $('#emoji-editor'),
+    });
+
+
+    $('.emoji-editor').on('paste', (e) => {
+
+        // 考虑到以后会存在文件之类的出img之外的标签，
+        // 所以只能在粘贴的时候先去掉标签然后插入到光标所在位置 
+
+        // 将复制的图文混合中包含的图片直接去掉 
+        let clipboardData = e.originalEvent.clipboardData;
+        let data = clipboardData ? clipboardData.getData('text/plain') : window.clipboardData.getData('Text');
+        if (data) {
+            // 插入文本 
+            var eidtor = $('.emoji-editor').get(0);
+            util.insertTextToEditor(editor, text);
         }
-    } else if ((sel = doc.selection) && sel.type != "Control") {
-        var textRange = sel.createRange();
-        var preCaretTextRange = doc.body.createTextRange();
-        preCaretTextRange.moveToElementText(elem);
-        preCaretTextRange.setEndPoint("EndToEnd", textRange);
-        caretOffset = preCaretTextRange.text.length;
-    }
-    return caretOffset;
-};
+        e.preventDefault();
+        return false;
+    });
 
-let _setEditableCaretPostion = function (elem, pos) {
-    var range = document.createRange();
-    var sel = window.getSelection();
-    range.setStart(el.childNodes[2], pos);
-    range.collapse(true);
-    sel.removeAllRanges();
-    sel.addRange(range);
-};
 
-$(btn).emotion({
-    input: $('.emoji-editor'),
+    initAt();
+
+    $('.addFile').on('click', function (e) {
+        var node = $('<div>');
+        node.addClass = "message-thumbnail";
+        node.append('<img  src="http://localhost:10001/modules/mdpublic/chat/resource/images/people200x200.png"/>');
+        util.insertElemToEditor($('.emoji-editor').get(0), node.get(0).outerHTML);
+    });
+
+    $(document).on('keydown', '.emoji-editor', function (e) {
+        // 获取选定对象
+        var selection = getSelection();
+        // 设置最后光标对象
+        window.lastEditRange = selection.getRangeAt(0);
+        if (e.keyCode == 13 && e.ctrlKey) {
+            console.log('换行');
+            document.execCommand('insertHTML', false, '\n<br />\n<br />');
+        } else if (e.keyCode == 13 && !e.ctrlKey) {
+            console.log('faxiaoxi ');
+        }
+    }).on('click', (e) => {
+        // 获取选定对象
+        var selection = getSelection();
+        // 设置最后光标对象
+        window.lastEditRange = selection.getRangeAt(0);
+    })
+
 });
 
-var editor = new MediumEditor('.emoji-editor', {
+
+
+
+
+/**
+ * MediumEditor
+ */
+
+var editor = new MediumEditor('#emoji-editor2', {
     disableReturn: true,
     disableDoubleReturn: true,
     disableExtraSpaces: true,
@@ -59,6 +84,7 @@ var editor = new MediumEditor('.emoji-editor', {
         customClassOption: 'btn',
         customClassOptionText: 'Create Button'
     },
+    autoLink: true,
     paste: {
         cleanAttrs: ['class', 'style', 'dir'],
         cleanTags: ['label', 'meta', 'img']
@@ -82,22 +108,7 @@ editor.subscribe('editableKeydown', function (e, elem) {
     }
 });
 
-// $('.emoji-editor').on('paste', (e) => {
 
-//     // 考虑到以后会存在文件之类的出img之外的标签，
-//     // 所以只能在粘贴的时候先去掉标签然后插入到光标所在位置 
-
-//     // 将复制的图文混合中包含的图片直接去掉 
-//     let clipboardData = e.originalEvent.clipboardData;
-//     let data = clipboardData ? clipboardData.getData('text/plain') : window.clipboardData.getData('Text');
-//     if (data) {
-//         // 插入文本 
-//         var eidtor = $('.emoji-editor').get(0);
-//         util.insertTextToEditor(editor, text);
-//     }
-//     e.preventDefault();
-//     return false;
-// });
 
 function initAt() {
     $.fn.atwho.debug = true
@@ -164,26 +175,5 @@ function initAt() {
 }
 
 
-$(function () {
 
-    initAt();
-
-    $(document).on('keydown', '.emoji-editor', function (e) {
-        // 获取选定对象
-        var selection = getSelection();
-        // 设置最后光标对象
-        window.lastEditRange = selection.getRangeAt(0);
-        if (e.keyCode == 13 && e.ctrlKey) {
-            console.log('换行');
-        } else if (e.keyCode == 13 && !e.ctrlKey) {
-            console.log('faxiaoxi ');
-        }
-    }).on('click', (e) => {
-        // 获取选定对象
-        var selection = getSelection();
-        // 设置最后光标对象
-        window.lastEditRange = selection.getRangeAt(0);
-    })
-
-});
 

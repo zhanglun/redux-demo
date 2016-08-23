@@ -24,40 +24,6 @@ let defaults = {
 
 let emotionPanelHtml = require('./panel.html');
 
-// 获取当前光标所在的位置
-let _getPointPosition = function (elem) {
-  var caretOffset = 0;
-  var doc = elem.ownerDocument || elem.document;
-  var win = doc.defaultView || doc.parentWindow;
-  var sel;
-  if (typeof win.getSelection != "undefined") {
-    sel = win.getSelection();
-    if (sel.rangeCount > 0) {
-      var range = win.getSelection().getRangeAt(0);
-      var preCaretRange = range.cloneRange();
-      preCaretRange.selectNodeContents(elem);
-      preCaretRange.setEnd(range.endContainer, range.endOffset);
-      caretOffset = preCaretRange.toString().length;
-    }
-  } else if ((sel = doc.selection) && sel.type != "Control") {
-    var textRange = sel.createRange();
-    var preCaretTextRange = doc.body.createTextRange();
-    preCaretTextRange.moveToElementText(elem);
-    preCaretTextRange.setEndPoint("EndToEnd", textRange);
-    caretOffset = preCaretTextRange.text.length;
-  }
-  return caretOffset;
-};
-
-let _setEditableCaretPostion = function (elem, pos) {
-  var range = document.createRange();
-  var sel = window.getSelection();
-  range.setStart(el.childNodes[2], pos);
-  range.collapse(true);
-  sel.removeAllRanges();
-  sel.addRange(range);
-};
-
 function Emotion(el, conf) {
   this.settings = $.extend({}, defaults, conf);
   this.$el = {};
@@ -148,13 +114,9 @@ Emotion.prototype.bindEvents = function () {
     let target = _this.$target.get(0);
     target.focus();
     // 调用 insertImg 方法插入表情
-    console.log(_getPointPosition(target));
-    let currentPos = _getPointPosition(target);
     let oldVal = target.innerHTML;
     _insertimg(target, twemoji.parse(val));
     // target.innerHTML = oldVal.slice(0, currentPos) + twemoji.parse(val) + oldVal.slice(currentPos);
-    console.log('after: %s', _getPointPosition(target));
-    document.title = currentPos + twemoji.parse(val).length;
     // TODO: set eidtable caret Position;
     // if (target.setSelectionRange) {
     //   target.setSelectionRange(currentPos + val.length, currentPos + val.length);
@@ -215,7 +177,6 @@ $.fn.emotion = function (options) {
 };
 
 export default Emotion;
-
 
 
 function _insertimg(container, elemstr) {

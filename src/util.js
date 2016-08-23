@@ -105,3 +105,7 @@ export function insertElemToEditor(editor, elemstr){
   }
   editor.focus();
 }
+
+export function insertDOMNode (editor, node) {
+  document.execCommand('insertHTML', false, node);
+}
