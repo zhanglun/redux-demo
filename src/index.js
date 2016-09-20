@@ -14,7 +14,7 @@ let emotion = null;
 $(function () {
 
     $(btn).emotion({
-        input: $('#emoji-editor'),
+        input: $('#emoji-editor2'),
     });
 
 
@@ -45,7 +45,7 @@ $(function () {
         util.insertElemToEditor($('.emoji-editor').get(0), node.get(0).outerHTML);
     });
 
-    $(document).on('keydown', '.emoji-editor', function (e) {
+    $(document).on('keydown', '#emoji-editor', function (e) {
         // 获取选定对象
         var selection = getSelection();
         // 设置最后光标对象
@@ -57,23 +57,86 @@ $(function () {
             console.log('faxiaoxi ');
         }
     }).on('click', (e) => {
-        // 获取选定对象
-        var selection = getSelection();
-        // 设置最后光标对象
-        window.lastEditRange = selection.getRangeAt(0);
+        // // 获取选定对象
+        // var selection = getSelection();
+        // // 设置最后光标对象
+        // window.lastEditRange = selection.getRangeAt(0);
     })
 
 });
-
-
-
-
 
 /**
  * MediumEditor
  */
 
+var isFilePaste = function (event) {
+    return event &&
+        event.clipboardData &&
+        event.clipboardData.items &&
+        $.inArray('Files', event.clipboardData.types) > -1;
+};
+var handleFilePaste = function (event) {
+    // ...
+    console.log('handleFilePaste');
+};
+
+var CustomPasteHandler = MediumEditor.extensions.paste.extend({
+    cleanPastedHTML: true,
+    handlePaste: function (event) {
+        if (isFilePaste(event)) {
+            handleFilePaste(event);
+            this.trigger('editablePaste', event);
+            return;
+        }
+        // If it's not a file paste, fallback to the default paste handler logic
+        MediumEditor.extensions.paste.prototype.handlePaste.apply(this, arguments);
+    },
+    handlePasteBinPaste: function (event) {
+        if (isFilePaste(event)) {
+            handleFilePaste(event);
+            this.trigger('editablePaste', event);
+            return;
+        }
+        // If it's not a file paste, fallback to the default paste handler logic
+        MediumEditor.extensions.paste.prototype.handlePaste.apply(this, arguments);
+    }
+});
+
 var editor = new MediumEditor('#emoji-editor2', {
+    disableReturn: true,
+    disableDoubleReturn: true,
+    // disableExtraSpaces: true,
+    forcePlainText: false,
+    disableEditing: true,
+    toolbar: false,
+    // anchor: {
+    //     placeholderText: 'Type a link',
+    //     customClassOption: 'btn',
+    //     customClassOptionText: 'Create Button'
+    // },
+    // autoLink: true,
+    // // paste: {
+    // //     /* This example includes the default options for paste,
+    // //        if nothing is passed this is what it used */
+    // //     forcePlainText: true,
+    // //     cleanPastedHTML: false,
+    // //     cleanReplacements: [],
+    // //     cleanAttrs: ['class', 'style', 'dir'],
+    // //     cleanTags: ['meta'],
+    // //     unwrapTags: [],
+    // // },
+    // anchorPreview: {
+    //     hideDelay: 300
+    // },
+    // placeholder: {
+    //     text: 'Click to edit'
+    // }
+    extensions: {
+        paste: new CustomPasteHandler(),
+    },
+});
+
+var editor = new MediumEditor('#emoji-editor3', {
     disableReturn: true,
     disableDoubleReturn: true,
     disableExtraSpaces: true,
@@ -85,26 +148,51 @@ var editor = new MediumEditor('#emoji-editor2', {
         customClassOptionText: 'Create Button'
     },
     autoLink: true,
-    paste: {
-        cleanAttrs: ['class', 'style', 'dir'],
-        cleanTags: ['label', 'meta', 'img']
-    },
+    // paste: {
+    //     cleanAttrs: ['class', 'style', 'dir'],
+    //     cleanTags: ['label', 'meta', 'img']
+    // },
     anchorPreview: {
         hideDelay: 300
     },
     placeholder: {
         text: 'Click to edit'
-    }
+    },
+    extensions: {
+        paste: new CustomPasteHandler(),
+    },
 });
 
-editor.subscribe('editableKeydown', function (e, elem) {
+
+
+
+editor.subscribe('editableKeydown', function (event, elem) {
     if ((event.metaKey || event.ctrlKey || event.altKey || event.shiftKey)
         && event.keyCode === 13) {
         // 换行处理
         // 阻断原处理流程
         event.preventDefault();
-        util.insertElemToEditor($('.emoji-editor').get(0), '<br />');
-        util.insertElemToEditor($('.emoji-editor').get(0), '<br />');
+        util.insertElemToEditor($('#emoji-editor2').get(0), '<br />');
+        util.insertElemToEditor($('#emoji-editor2').get(0), '<br />');
+    }
+
+});
+editor.subscribe('editablePaste', function (e, elem) {
+    console.log(event, elem);
+    var items = e.clipboardData && e.clipboardData.items;
+    var data = { files: [] };
+    if (items && items.length) {
+        $.each(items, function (index, item) {
+            var file = item.getAsFile && item.getAsFile();
+            if (file) {
+                file.name = "剪切板贴图.png";
+                file.isFromClipBoard = true;
+                data.files.push(file);
+            }
+        });
+        if (data.files.length > 0) {
+            up.addFile(data.files);
+        }
     }
 });
 
@@ -172,8 +260,17 @@ function initAt() {
     $('.emoji-editor').on('inserted.atwho', function (e) {
         $(this).find('.atwho-inserted span').first().unwrap();
     });
+    $('.emoji-editor1').atwho(at_config).atwho(emoji_config);
+    $('.emoji-editor1').on('inserted.atwho', function (e) {
+        $(this).find('.atwho-inserted span').first().unwrap();
+    });
+
+
+    $('.emoji-editor1').on('blur', function () {
+        console.log('emoji-editor1 blur');
+    })
+
+    $('.triggerbtn').on('click', function () {
+        window.getSelection().removeAllRanges();
+    })
 }
-
-
-
-
