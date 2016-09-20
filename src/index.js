@@ -80,7 +80,12 @@ var handleFilePaste = function (event) {
     console.log('handleFilePaste');
 };
 
-var CustomPasteHandler = MediumEditor.extensions.paste.extend({
+
+var CustomPasteHandler = MediumEditor.Extension.extend({
+    name: 'test',
+});
+CustomPasteHandler = MediumEditor.extensions.test.extend(MediumEditor.extensions.paste).extend({
+    name: 'test',
     cleanPastedHTML: true,
     handlePaste: function (event) {
         if (isFilePaste(event)) {
@@ -115,16 +120,16 @@ var editor = new MediumEditor('#emoji-editor2', {
     //     customClassOptionText: 'Create Button'
     // },
     // autoLink: true,
-    // // paste: {
-    // //     /* This example includes the default options for paste,
-    // //        if nothing is passed this is what it used */
-    // //     forcePlainText: true,
-    // //     cleanPastedHTML: false,
-    // //     cleanReplacements: [],
-    // //     cleanAttrs: ['class', 'style', 'dir'],
-    // //     cleanTags: ['meta'],
-    // //     unwrapTags: [],
-    // // },
+    paste: {
+        /* This example includes the default options for paste,
+           if nothing is passed this is what it used */
+        forcePlainText: true,
+        cleanPastedHTML: false,
+        cleanReplacements: [],
+        cleanAttrs: ['class', 'style', 'dir'],
+        cleanTags: ['meta'],
+        unwrapTags: [],
+    },
     // anchorPreview: {
     //     hideDelay: 300
     // },
@@ -132,7 +137,7 @@ var editor = new MediumEditor('#emoji-editor2', {
     //     text: 'Click to edit'
     // }
     extensions: {
-        paste: new CustomPasteHandler(),
+        test: new CustomPasteHandler(),
     },
 });
 
@@ -148,10 +153,10 @@ var editor = new MediumEditor('#emoji-editor3', {
         customClassOptionText: 'Create Button'
     },
     autoLink: true,
-    // paste: {
-    //     cleanAttrs: ['class', 'style', 'dir'],
-    //     cleanTags: ['label', 'meta', 'img']
-    // },
+    paste: {
+        cleanAttrs: ['class', 'style', 'dir'],
+        cleanTags: ['label', 'meta', 'img']
+    },
     anchorPreview: {
         hideDelay: 300
     },
@@ -159,7 +164,7 @@ var editor = new MediumEditor('#emoji-editor3', {
         text: 'Click to edit'
     },
     extensions: {
-        paste: new CustomPasteHandler(),
+        test: new CustomPasteHandler(),
     },
 });
 
