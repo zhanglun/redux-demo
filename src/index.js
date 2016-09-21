@@ -14,7 +14,7 @@ let emotion = null;
 $(function () {
 
     $(btn).emotion({
-        input: $('#emoji-editor2'),
+        input: $('#emoji-editor1'),
     });
 
 
@@ -56,152 +56,8 @@ $(function () {
         } else if (e.keyCode == 13 && !e.ctrlKey) {
             console.log('faxiaoxi ');
         }
-    }).on('click', (e) => {
-        // // 获取选定对象
-        // var selection = getSelection();
-        // // 设置最后光标对象
-        // window.lastEditRange = selection.getRangeAt(0);
     })
-
 });
-
-/**
- * MediumEditor
- */
-
-var isFilePaste = function (event) {
-    return event &&
-        event.clipboardData &&
-        event.clipboardData.items &&
-        $.inArray('Files', event.clipboardData.types) > -1;
-};
-var handleFilePaste = function (event) {
-    // ...
-    console.log('handleFilePaste');
-};
-
-
-var CustomPasteHandler = MediumEditor.Extension.extend({
-    name: 'test',
-});
-CustomPasteHandler = MediumEditor.extensions.test.extend(MediumEditor.extensions.paste).extend({
-    name: 'test',
-    cleanPastedHTML: true,
-    handlePaste: function (event) {
-        if (isFilePaste(event)) {
-            handleFilePaste(event);
-            this.trigger('editablePaste', event);
-            return;
-        }
-        // If it's not a file paste, fallback to the default paste handler logic
-        MediumEditor.extensions.paste.prototype.handlePaste.apply(this, arguments);
-    },
-    handlePasteBinPaste: function (event) {
-        if (isFilePaste(event)) {
-            handleFilePaste(event);
-            this.trigger('editablePaste', event);
-            return;
-        }
-        // If it's not a file paste, fallback to the default paste handler logic
-        MediumEditor.extensions.paste.prototype.handlePaste.apply(this, arguments);
-    }
-});
-
-var editor = new MediumEditor('#emoji-editor2', {
-    disableReturn: true,
-    disableDoubleReturn: true,
-    // disableExtraSpaces: true,
-    forcePlainText: false,
-    disableEditing: true,
-    toolbar: false,
-    // anchor: {
-    //     placeholderText: 'Type a link',
-    //     customClassOption: 'btn',
-    //     customClassOptionText: 'Create Button'
-    // },
-    // autoLink: true,
-    paste: {
-        /* This example includes the default options for paste,
-           if nothing is passed this is what it used */
-        forcePlainText: true,
-        cleanPastedHTML: false,
-        cleanReplacements: [],
-        cleanAttrs: ['class', 'style', 'dir'],
-        cleanTags: ['meta'],
-        unwrapTags: [],
-    },
-    // anchorPreview: {
-    //     hideDelay: 300
-    // },
-    // placeholder: {
-    //     text: 'Click to edit'
-    // }
-    extensions: {
-        test: new CustomPasteHandler(),
-    },
-});
-
-var editor = new MediumEditor('#emoji-editor3', {
-    disableReturn: true,
-    disableDoubleReturn: true,
-    disableExtraSpaces: true,
-    disableEditing: true,
-    toolbar: false,
-    anchor: {
-        placeholderText: 'Type a link',
-        customClassOption: 'btn',
-        customClassOptionText: 'Create Button'
-    },
-    autoLink: true,
-    paste: {
-        cleanAttrs: ['class', 'style', 'dir'],
-        cleanTags: ['label', 'meta', 'img']
-    },
-    anchorPreview: {
-        hideDelay: 300
-    },
-    placeholder: {
-        text: 'Click to edit'
-    },
-    extensions: {
-        test: new CustomPasteHandler(),
-    },
-});
-
-
-
-
-editor.subscribe('editableKeydown', function (event, elem) {
-    if ((event.metaKey || event.ctrlKey || event.altKey || event.shiftKey)
-        && event.keyCode === 13) {
-        // 换行处理
-        // 阻断原处理流程
-        event.preventDefault();
-        util.insertElemToEditor($('#emoji-editor2').get(0), '<br />');
-        util.insertElemToEditor($('#emoji-editor2').get(0), '<br />');
-    }
-
-});
-editor.subscribe('editablePaste', function (e, elem) {
-    console.log(event, elem);
-    var items = e.clipboardData && e.clipboardData.items;
-    var data = { files: [] };
-    if (items && items.length) {
-        $.each(items, function (index, item) {
-            var file = item.getAsFile && item.getAsFile();
-            if (file) {
-                file.name = "剪切板贴图.png";
-                file.isFromClipBoard = true;
-                data.files.push(file);
-            }
-        });
-        if (data.files.length > 0) {
-            up.addFile(data.files);
-        }
-    }
-});
-
-
 
 function initAt() {
     $.fn.atwho.debug = true
@@ -238,8 +94,8 @@ function initAt() {
         at: "@",
         data: names,
         headerTpl: '<div class="atwho-header">Member List<small>↑&nbsp;↓&nbsp;</small></div>',
-        insertTpl: '<span>${atwho-at}${name}</span>',
-        displayTpl: "<li>${name} <small>${email}</small></li>",
+        insertTpl: '${atwho-at}${name}',
+        displayTpl: '<li data-mentionid="${name}">${name} <small>${email}</small></li>',
         limit: 200,
         startWithSpace: false,
         callbacks: {
@@ -260,22 +116,27 @@ function initAt() {
         delay: 400
     }
     emoji_config.insertTpl = "<img src='https://assets-cdn.github.com/images/icons/emoji/${name}.png'  height='20' width='20' />"
-
-    $('.emoji-editor').atwho(at_config).atwho(emoji_config);
-    $('.emoji-editor').on('inserted.atwho', function (e) {
-        $(this).find('.atwho-inserted span').first().unwrap();
+    var $inputer = $('.emoji-editor');
+    $inputer.atwho(at_config).atwho(emoji_config);
+    $inputer.on('inserted.atwho', function (e, elem) {
+        window.mentionsInserted = 
+        console.log(elem);
     });
-    $('.emoji-editor1').atwho(at_config).atwho(emoji_config);
-    $('.emoji-editor1').on('inserted.atwho', function (e) {
-        $(this).find('.atwho-inserted span').first().unwrap();
+    $inputer.on("matched.atwho", function (event, flag, query) {
+        console.log(event, "matched " + flag + " and the result is " + query);
     });
-
 
     $('.emoji-editor1').on('blur', function () {
         console.log('emoji-editor1 blur');
     })
 
     $('.triggerbtn').on('click', function () {
-        window.getSelection().removeAllRanges();
+        var $inputer = $('.emoji-editor');
+        var value = $inputer.val();
+        mentions = value.match(/@\S+/ig);
+        metnions = mentions.map(function(item){
+            // 去掉@
+            return item.slice(1);
+        });
     })
 }
